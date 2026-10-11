@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#FFF6EE">
+<meta name="description" content="考公人格测试:15 题测出你适合体制内的哪条赛道,含岗位方向参考">
+<title>考公人格测试 · 你适合报哪种岗?</title>
+<!--
+  ============================================================
+  《考公人格测试》v1.0 · 单文件离线版 · 2026-10
+  买家使用:双击打开,或手机用浏览器打开,全程不用联网。
+  ------------------------------------------------------------
+  想改内容?只动 <script> 里的三处,样式和引擎不用碰:
+   1) SHOP_NAME  —— 填你的店铺名,会显示在结果页底部当水印;留空则不显示
+   2) QUESTIONS  —— 15 道题,每题 4 个选项(dim 三选一:scene 工作重心 / rhythm 节奏 / way 成就感来源)
+   3) TYPES      —— 8 种体制人格的名称与文案(posts 岗位方向 / tip 报考提醒 也在里面)
+  小猫小狗是页面里的 <symbol> 内联 SVG(搜 svg-cat / svg-dog / svg-paw),不用改。
+  ============================================================
+-->
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","HarmonyOS Sans SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+  background:#FFF6EE;color:#5A4A40;line-height:1.65;overflow-x:hidden;
+  -webkit-font-smoothing:antialiased;
+}
+/* ---------- 背景:奶油色光斑 + 散落爪印 ---------- */
+.bg-glow{position:fixed;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
+.bg-1{width:420px;height:420px;left:-130px;top:-110px;background:radial-gradient(circle,rgba(255,199,166,.55),transparent 70%)}
+.bg-2{width:520px;height:520px;right:-170px;bottom:-150px;background:radial-gradient(circle,rgba(255,214,232,.55),transparent 70%)}
+.bg-3{width:380px;height:380px;right:-120px;top:-90px;background:radial-gradient(circle,rgba(216,243,228,.6),transparent 70%)}
+.bg-deco{position:fixed;z-index:0;pointer-events:none}
+#app{position:relative;z-index:1;max-width:560px;margin:0 auto;padding:calc(20px + env(safe-area-inset-top)) 18px calc(30px + env(safe-area-inset-bottom))}
+.screen{display:none}
+.screen.active{display:block;animation:fadeUp .4s ease both}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes bob{0%,100%{transform:translateY(0) rotate(var(--rot,0deg))}50%{transform:translateY(-4px) rotate(var(--rot,0deg))}}
+.no-anim *,.no-anim *::before,.no-anim *::after{transition:none!important;animation:none!important}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---------- 通用:白卡片 ---------- */
+.card{background:#FFFFFF;border:2.5px solid #FFE5D5;border-radius:26px;box-shadow:0 16px 40px rgba(255,160,120,.14)}
+
+/* ---------- 首页 ---------- */
+#scr-intro.active{display:flex;flex-direction:column;justify-content:center;min-height:calc(100vh - 70px);min-height:calc(100svh - 70px)}
+.landing-card{position:relative;width:100%;padding:52px 22px 30px;text-align:center}
+.eyebrow{font-size:11px;letter-spacing:.34em;color:#FF8FAB;font-weight:800;margin-bottom:12px}
+.title{font-size:clamp(32px,8.6vw,44px);font-weight:900;letter-spacing:.04em;color:#4A3B33}
+.sub{color:#8A776B;font-size:15px;margin:14px 0 22px;line-height:2}
+.sub b{color:#E8734F}
+.feat-row{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.feat{font-size:12.5px;color:#7A675B;background:#FFF8F2;border:1.5px solid #FFE5D5;padding:6px 12px;border-radius:999px}
+.btn{border:none;cursor:pointer;font-family:inherit;touch-action:manipulation}
+.btn-primary{width:100%;margin-top:26px;padding:16px;border-radius:999px;font-size:17px;font-weight:800;color:#FFFFFF;background:linear-gradient(135deg,#FFB199,#FF8FAB);box-shadow:0 5px 0 #F095AD;transition:transform .12s,box-shadow .12s}
+.btn-primary:active{transform:translateY(3px);box-shadow:0 2px 0 #F095AD}
+.tiny{font-size:12px;color:#B5A79C;margin-top:14px}
+.tiny.center{text-align:center}
+/* 趴在卡片上边框的小猫小狗 */
+.peek{position:absolute;pointer-events:none;filter:drop-shadow(0 6px 10px rgba(200,140,110,.18));animation:bob 3.2s ease-in-out infinite}
+.peek-cat{width:80px;height:73px;top:-46px;left:20px;--rot:-6deg;transform:rotate(var(--rot))}
+.peek-dog{width:76px;height:70px;top:-44px;right:18px;--rot:6deg;transform:rotate(var(--rot))}
+.peek.sm{width:58px;height:53px;top:-32px}
+.peek.sm.peek-cat{left:14px}
+.peek.sm.peek-dog{right:14px}
+
+/* ---------- 答题 ---------- */
+.quiz-top{display:flex;align-items:center;gap:12px;margin:6px 0 0 0}
+.btn-back{width:38px;height:38px;flex:0 0 auto;border-radius:50%;background:#FFFFFF;border:2px solid #FFE5D5;color:#B08D78;font-size:20px;line-height:1;cursor:pointer;font-family:inherit;touch-action:manipulation}
+.btn-back[disabled]{opacity:.25}
+.progress{flex:1;height:10px;background:#FBEEDF;border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;width:0;background:linear-gradient(90deg,#FFC3A0,#FF8FAB);border-radius:999px;transition:width .3s ease}
+.counter{font-size:13px;color:#A08D80;font-variant-numeric:tabular-nums;flex:0 0 auto}
+.q-card{position:relative;margin-top:40px;padding:36px 16px 20px;min-height:52vh}
+.q-text{font-size:clamp(18px,5.2vw,22px);font-weight:800;line-height:1.6;margin:0 4px 22px;color:#4A3B33}
+.opts{display:flex;flex-direction:column;gap:11px}
+.opt{display:flex;gap:11px;align-items:center;text-align:left;width:100%;padding:14px 14px;border-radius:18px;background:#FFFDFB;border:2px solid #FFE7D8;color:#5A4A40;font-size:15.5px;line-height:1.55;cursor:pointer;font-family:inherit;transition:border-color .15s,background .15s,transform .15s;touch-action:manipulation}
+.opt:hover{border-color:#FFC9D6}
+.opt.picked{border-color:#FF9FB6;background:#FFF3F7;transform:scale(.985)}
+.opt-tag{flex:0 0 auto;width:26px;height:26px;border-radius:50%;background:#FFF1E6;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#B08D78}
+.opt.picked .opt-tag{background:#FFC9D6;color:#8A4A5B}
+.opt-tx{flex:1}
+.opt-paw{flex:0 0 auto;width:20px;height:20px;color:#E8CFC0;opacity:.35;transition:opacity .18s,transform .18s,color .18s}
+.opt.picked .opt-paw{color:#FF8FAB;opacity:1;transform:scale(1.15) rotate(-10deg)}
+#scr-quiz .tiny{text-align:center}
+.quiz-foot{display:flex;justify-content:space-between;align-items:center;margin-top:14px;padding:0 2px}
+.link-btn{background:none;border:none;font-family:inherit;font-size:13.5px;color:#A08D80;cursor:pointer;padding:8px 6px;border-radius:10px;touch-action:manipulation}
+.link-btn:hover{color:#FF8FAB}
+.link-btn[disabled]{opacity:.3;cursor:default}
+#btn-clear{color:#C4A69C}
+#btn-clear.confirming{color:#E86A5A;font-weight:800}
+
+/* ---------- 结果 ---------- */
+.result-head{text-align:center;padding:12px 0 4px}
+.head-pets{display:flex;align-items:center;justify-content:center;gap:10px}
+.pet{width:48px;height:44px;flex:0 0 auto;filter:drop-shadow(0 6px 10px rgba(200,140,110,.18));animation:bob 3.4s ease-in-out infinite}
+.pet-cat{--rot:-5deg;transform:rotate(var(--rot))}
+.pet-dog{--rot:5deg;transform:rotate(var(--rot))}
+.result-kicker{color:#A08D80;font-size:14px;letter-spacing:.12em}
+.type-emoji{font-size:64px;line-height:1.25;margin-top:8px;filter:drop-shadow(0 8px 16px rgba(255,150,110,.25))}
+.type-name{font-size:clamp(32px,9vw,42px);font-weight:900;letter-spacing:.04em;color:var(--accent,#FF8FAB)}
+.type-tagline{color:#7A675B;font-size:15px;margin-top:8px;line-height:1.8}
+.chip-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:16px}
+.chip{font-size:12.5px;padding:6px 12px;border-radius:999px;background:#FFFFFF;border:1.5px solid #FFE5D5;color:#6B584C}
+.panel{position:relative;background:#FFFFFF;border:2.5px solid #FFE7D8;border-radius:24px;padding:18px;margin-top:16px;box-shadow:0 10px 26px rgba(255,160,120,.10)}
+.panel-paw{position:absolute;top:-11px;right:14px;width:26px;height:26px;color:#FFC9D6;transform:rotate(16deg);pointer-events:none}
+.gauge-label{display:flex;justify-content:space-between;align-items:baseline;font-size:13.5px;color:#A08D80}
+.gauge-label b{font-size:20px;color:var(--accent,#FF8FAB);font-variant-numeric:tabular-nums}
+.battery{position:relative;height:44px;border:3px solid #E8D3C3;border-radius:14px;padding:5px;margin:12px 10px 0 0;background:#FFFDFB}
+.battery::after{content:"";position:absolute;right:-10px;top:50%;transform:translateY(-50%);width:7px;height:16px;border-radius:0 4px 4px 0;background:#E8D3C3}
+.battery-fill{height:100%;width:0;border-radius:9px;background:var(--accent,#FF8FAB);transition:width 1.2s cubic-bezier(.22,.8,.24,1)}
+.bars{margin-top:16px;display:flex;flex-direction:column;gap:12px}
+.bar-row{display:grid;grid-template-columns:76px 1fr 44px;gap:10px;align-items:center;font-size:13px;color:#8A776B}
+.bar-track{height:10px;border-radius:999px;background:#FBEDE0;overflow:hidden}
+.bar-fill{height:100%;width:0;border-radius:999px;background:var(--accent,#FF8FAB);transition:width 1s cubic-bezier(.22,.8,.24,1) .15s}
+.bar-pct{text-align:right;font-variant-numeric:tabular-nums;color:#6B584C}
+.prose p{margin-bottom:12px;font-size:15px;line-height:1.95;color:#5F4E43}
+.prose p:last-child{margin-bottom:0}
+.lists{display:grid;gap:16px}
+@media(min-width:520px){.lists{grid-template-columns:1fr 1fr}}
+.list-col h3{font-size:14px;color:#6B584C;margin-bottom:10px;letter-spacing:.04em}
+.list-col ul{list-style:none}
+.list-col li{position:relative;padding-left:24px;font-size:14px;line-height:1.8;color:#5F4E43;margin-bottom:8px}
+.list-charge li::before{content:"✓";position:absolute;left:2px;color:#4CBE7E;font-weight:800}
+.list-drain li::before{content:"✕";position:absolute;left:2px;color:#FF8F9E;font-weight:800}
+.panel-h3{font-size:14px;color:#6B584C;margin-bottom:10px;letter-spacing:.04em}
+.list-posts{list-style:none}
+.list-posts li{position:relative;padding-left:24px;font-size:14px;line-height:1.8;color:#5F4E43;margin-bottom:8px}
+.list-posts li:last-child{margin-bottom:0}
+.list-posts li::before{content:"▸";position:absolute;left:2px;color:var(--accent,#FF8FAB);font-weight:800}
+.compat p{display:flex;gap:10px;font-size:14px;line-height:1.8;color:#5F4E43;margin-bottom:8px}
+.compat p:last-child{margin-bottom:0}
+.compat b{flex:0 0 64px;color:#A08D80;font-weight:600}
+.paw-divider{display:flex;justify-content:center;gap:12px;margin-top:18px}
+.paw-divider svg{width:18px;height:18px}
+.share-row{display:flex;gap:10px;margin-top:16px}
+.btn-ghost{flex:1;padding:13px;border-radius:16px;background:#FFFFFF;border:2px solid #FFE0CC;color:#6B584C;font-size:14px;cursor:pointer;font-family:inherit;touch-action:manipulation;box-shadow:0 3px 0 #F5E0D2;transition:transform .12s,box-shadow .12s}
+.btn-ghost:active{transform:translateY(2px);box-shadow:0 1px 0 #F5E0D2}
+.others{margin-top:18px;background:#FFFDFB;border:2px solid #FFE7D8;border-radius:18px;padding:14px 16px}
+.others summary{cursor:pointer;font-size:14px;color:#6B584C;list-style:none;display:flex;align-items:center;gap:8px}
+.others summary::-webkit-details-marker{display:none}
+.others summary::after{content:"▾";color:#C9AE9E;margin-left:auto;transition:transform .2s}
+.others[open] summary::after{transform:rotate(180deg)}
+.sum-paw{width:16px;height:16px;color:#FFC9D6;flex:0 0 auto}
+.others-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:14px}
+.other-card{position:relative;padding:10px 12px;border-radius:14px;background:#FFF8F2;border:1.5px solid #FFE7D8;font-size:13px;cursor:pointer;transition:border-color .15s,background .15s,transform .12s}
+.other-card:hover{border-color:#FFC9D6}
+.other-card:active{transform:scale(.97)}
+.other-card::after{content:"›";position:absolute;right:10px;top:6px;color:#D9BFAF;font-weight:800;font-size:15px}
+.other-card.cur{border-color:var(--accent,#FF8FAB);background:#FFF4F9}
+.oc-me{display:inline-block;font-size:10.5px;line-height:1.6;background:#FFC9D6;color:#8A4A5B;border-radius:999px;padding:0 7px;margin-left:6px;font-weight:800;vertical-align:1px}
+.other-card .oc-name{font-weight:800;color:#4A3B33}
+.other-card .oc-tag{color:#A89A8E;font-size:11.5px;line-height:1.5;margin-top:3px}
+.shop-line{text-align:center;color:#B5A79C;font-size:12.5px;margin-top:22px;line-height:2}
+</style>
+</head>
+<body>
+<div class="bg-glow bg-1"></div>
+<div class="bg-glow bg-2"></div>
+<div class="bg-glow bg-3"></div>
+
+<!-- 散落爪印(背景装饰) -->
+<svg class="bg-deco" style="width:64px;height:64px;left:2%;top:9%;transform:rotate(-18deg);opacity:.32;color:#FFC9D6"><use href="#svg-paw"/></svg>
+<svg class="bg-deco" style="width:44px;height:44px;right:4%;top:16%;transform:rotate(22deg);opacity:.3;color:#FFD9AD"><use href="#svg-paw"/></svg>
+<svg class="bg-deco" style="width:80px;height:80px;left:-16px;bottom:22%;transform:rotate(10deg);opacity:.28;color:#FFC9D6"><use href="#svg-paw"/></svg>
+<svg class="bg-deco" style="width:56px;height:56px;right:-10px;bottom:12%;transform:rotate(-24deg);opacity:.32;color:#CDE8D4"><use href="#svg-paw"/></svg>
+<svg class="bg-deco" style="width:36px;height:36px;left:12%;bottom:6%;transform:rotate(30deg);opacity:.28;color:#FFD9AD"><use href="#svg-paw"/></svg>
+<svg class="bg-deco" style="width:40px;height:40px;right:14%;top:3%;transform:rotate(-12deg);opacity:.3;color:#FFC9D6"><use href="#svg-paw"/></svg>
+
+<!-- 手绘小猫 / 小狗 / 爪印(SVG symbol,全局复用) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="svg-paw" viewBox="0 0 40 40">
+    <ellipse cx="20" cy="26.5" rx="9.5" ry="8" fill="currentColor"/>
+    <circle cx="7.5" cy="15" r="4.3" fill="currentColor"/>
+    <circle cx="15" cy="9.5" r="4.6" fill="currentColor"/>
+    <circle cx="25" cy="9.5" r="4.6" fill="currentColor"/>
+    <circle cx="32.5" cy="15" r="4.3" fill="currentColor"/>
+  </symbol>
+  <symbol id="svg-cat" viewBox="0 0 120 110">
+    <path d="M30 36 L20 8 L52 20 Z" fill="#FFE3BE" stroke="#5C4A42" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M90 36 L100 8 L68 20 Z" fill="#FFE3BE" stroke="#5C4A42" stroke-width="3.5" stroke-linejoin="round"/>
+    <path d="M31 30 L26 15 L44 21 Z" fill="#FFB7C5"/>
+    <path d="M89 30 L94 15 L76 21 Z" fill="#FFB7C5"/>
+    <circle cx="60" cy="58" r="40" fill="#FFE3BE" stroke="#5C4A42" stroke-width="3.5"/>
+    <circle cx="44" cy="54" r="4.5" fill="#5C4A42"/>
+    <circle cx="76" cy="54" r="4.5" fill="#5C4A42"/>
+    <circle cx="45.5" cy="52.5" r="1.5" fill="#FFFFFF"/>
+    <circle cx="77.5" cy="52.5" r="1.5" fill="#FFFFFF"/>
+    <circle cx="36" cy="66" r="6" fill="#FFB3C0" opacity=".55"/>
+    <circle cx="84" cy="66" r="6" fill="#FFB3C0" opacity=".55"/>
+    <path d="M56 63 Q60 60 64 63 Q62.5 67.5 60 67.5 Q57.5 67.5 56 63 Z" fill="#FF8FA3"/>
+    <path d="M60 67.5 Q60 73 53.5 72.5 M60 67.5 Q60 73 66.5 72.5" fill="none" stroke="#5C4A42" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M16 55 L33 57.5 M16 66 L32.5 64.5 M104 55 L87 57.5 M104 66 L87.5 64.5" stroke="#C9AC97" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+  </symbol>
+  <symbol id="svg-dog" viewBox="0 0 120 110">
+    <ellipse cx="23" cy="50" rx="13" ry="25" transform="rotate(16 23 50)" fill="#DDA871" stroke="#5C4A42" stroke-width="3.5"/>
+    <ellipse cx="97" cy="50" rx="13" ry="25" transform="rotate(-16 97 50)" fill="#DDA871" stroke="#5C4A42" stroke-width="3.5"/>
+    <circle cx="60" cy="52" r="38" fill="#F3C894" stroke="#5C4A42" stroke-width="3.5"/>
+    <circle cx="46" cy="48" r="4.5" fill="#5C4A42"/>
+    <circle cx="74" cy="48" r="4.5" fill="#5C4A42"/>
+    <circle cx="47.5" cy="46.5" r="1.5" fill="#FFFFFF"/>
+    <circle cx="75.5" cy="46.5" r="1.5" fill="#FFFFFF"/>
+    <circle cx="34" cy="66" r="5.5" fill="#FFB3C0" opacity=".5"/>
+    <circle cx="86" cy="66" r="5.5" fill="#FFB3C0" opacity=".5"/>
+    <ellipse cx="60" cy="68" rx="19" ry="14" fill="#FFF6EA" stroke="#5C4A42" stroke-width="3"/>
+    <path d="M54 62.5 Q60 58.5 66 62.5 Q63.5 69 60 69 Q56.5 69 54 62.5 Z" fill="#5C4A42"/>
+    <circle cx="58" cy="61.5" r="1.3" fill="#FFFFFF" opacity=".8"/>
+    <path d="M60 69 Q60 74 54 74 M60 69 Q60 74 66 74" fill="none" stroke="#5C4A42" stroke-width="2.4" stroke-linecap="round"/>
+    <path d="M55.5 74.5 Q55.5 82 60 82 Q64.5 82 64.5 74.5 Z" fill="#FF9AA8" stroke="#5C4A42" stroke-width="2.2"/>
+  </symbol>
+</svg>
+
+<main id="app">
+
+  <!-- ======== 首页 ======== -->
+  <section class="screen active" id="scr-intro">
+    <div class="card landing-card">
+      <svg class="peek peek-cat"><use href="#svg-cat"/></svg>
+      <svg class="peek peek-dog"><use href="#svg-dog"/></svg>
+      <div class="eyebrow">CIVIL SERVICE CAREER TEST</div>
+      <h1 class="title">考公人格测试</h1>
+      <p class="sub">报岗的时候,大家都在算<b>报录比</b>。<br>但没人替你算的是:那些岗位<b>每天在干什么</b>,<br>以及——你的性格<b>扛不扛得住</b>那种日常。</p>
+      <div class="feat-row">
+        <span class="feat">🎯 8 种体制人格</span>
+        <span class="feat">📋 岗位方向参考</span>
+        <span class="feat">📸 可截图分享</span>
+      </div>
+      <button class="btn btn-primary" id="btn-start">开始测试 →</button>
+      <p class="tiny">15 题(每题 4 个选项)· 约 3 分钟 · 不用联网<br>结果帮你了解方向;实际报考以官方职位表的专业、学历等条件为准</p>
+    </div>
+  </section>
+
+  <!-- ======== 答题 ======== -->
+  <section class="screen" id="scr-quiz">
+    <div class="quiz-top">
+      <button class="btn-back" id="btn-back" aria-label="上一题">‹</button>
+      <div class="progress"><div class="progress-fill" id="prog-fill"></div></div>
+      <div class="counter" id="counter">1 / 15</div>
+    </div>
+    <div class="card q-card">
+      <svg class="peek peek-cat sm"><use href="#svg-cat"/></svg>
+      <svg class="peek peek-dog sm"><use href="#svg-dog"/></svg>
+      <h2 class="q-text" id="q-text"></h2>
+      <div class="opts" id="opts"></div>
+    </div>
+    <p class="tiny">凭第一直觉选,别纠结</p>
+    <div class="quiz-foot">
+      <button class="link-btn" id="btn-prev">‹ 上一题</button>
+      <button class="link-btn" id="btn-clear">清空重来,回首页</button>
+    </div>
+  </section>
+
+  <!-- ======== 结果 ======== -->
+  <section class="screen" id="scr-result">
+    <div class="result-head">
+      <div class="head-pets">
+        <svg class="pet pet-cat"><use href="#svg-cat"/></svg>
+        <p class="result-kicker" id="r-kicker">你的体制人格是——</p>
+        <svg class="pet pet-dog"><use href="#svg-dog"/></svg>
+      </div>
+      <div class="type-emoji" id="r-emoji"></div>
+      <h2 class="type-name" id="r-name"></h2>
+      <p class="type-tagline" id="r-tagline"></p>
+      <div class="chip-row" id="r-chips"></div>
+    </div>
+
+    <div class="panel">
+      <svg class="panel-paw"><use href="#svg-paw"/></svg>
+      <div class="gauge-label"><span id="r-gauge-label">外勤浓度</span><b id="r-hours"></b></div>
+      <div class="battery"><div class="battery-fill" id="bat-fill"></div></div>
+      <div class="bars" id="r-bars"></div>
+    </div>
+
+    <div class="panel prose">
+      <svg class="panel-paw" style="transform:rotate(-14deg)"><use href="#svg-paw"/></svg>
+      <p id="r-p1"></p>
+      <p id="r-p2"></p>
+    </div>
+
+    <div class="panel">
+      <svg class="panel-paw"><use href="#svg-paw"/></svg>
+      <h3 class="panel-h3">🎯 对口岗位方向</h3>
+      <ul class="list-posts" id="r-posts"></ul>
+    </div>
+
+    <div class="panel lists">
+      <svg class="panel-paw"><use href="#svg-paw"/></svg>
+      <div class="list-col">
+        <h3>✅ 这份工作的甜</h3>
+        <ul class="list-charge" id="r-charge"></ul>
+      </div>
+      <div class="list-col">
+        <h3>⚠️ 这份工作的苦</h3>
+        <ul class="list-drain" id="r-drain"></ul>
+      </div>
+    </div>
+
+    <div class="panel">
+      <svg class="panel-paw" style="transform:rotate(-14deg)"><use href="#svg-paw"/></svg>
+      <h3 class="panel-h3">📋 报考提醒</h3>
+      <p id="r-tip" style="font-size:14px;line-height:1.85;color:#5F4E43"></p>
+    </div>
+
+    <div class="panel compat">
+      <svg class="panel-paw" style="transform:rotate(-14deg)"><use href="#svg-paw"/></svg>
+      <p><b>搭班子顺</b><span id="r-match"></span></p>
+      <p><b>搭班子磨</b><span id="r-clash"></span></p>
+    </div>
+
+    <div class="paw-divider">
+      <svg style="color:#FFC9D6"><use href="#svg-paw"/></svg>
+      <svg style="color:#FFD9AD"><use href="#svg-paw"/></svg>
+      <svg style="color:#CDE8D4"><use href="#svg-paw"/></svg>
+    </div>
+
+    <div class="share-row">
+      <button class="btn-ghost" id="btn-myresult" style="display:none">← 返回我的结果</button>
+      <button class="btn-ghost" id="btn-copy">复制我的结果文案</button>
+      <button class="btn-ghost" id="btn-again">重新测一次</button>
+    </div>
+    <p class="tiny center" id="share-hint">📸 截图发给一起备考的朋友,看看 TA 测出来是哪种</p>
+
+    <details class="others">
+      <summary><svg class="sum-paw"><use href="#svg-paw"/></svg>看看全部 8 种体制人格(点开可看详情)</summary>
+      <div class="others-grid" id="others-grid"></div>
+    </details>
+
+    <p class="shop-line" id="shop-line"></p>
+  </section>
+
+</main>
+
+<script>
+/* ============================================================
+   ★ 可自定义区(改这里就行,下面的引擎不用碰)
+   ============================================================ */
+
+// 1) 店铺名:填上会显示在结果页底部当水印(转发自带广告);留空则不显示
+const SHOP_NAME = "";
+
+/* 2) 题库:15 道题,每题 4 个选项(画风不同,但同一边的两个选项投同一票)。
+   dim 含义:scene = 工作重心(对人/对事) / rhythm = 节奏(跑现场/坐得住) / way = 成就感(照章办事/钻研门道)
+   每个选项的 v 是它投的票,别改字母组合 */
+const QUESTIONS = [
+  { dim:'scene', q:'科室接到一个大活,负责人说「两块你挑一块」,你本能地想接:',
+    options:[
+      { t:'对外那块:对接几个部门,把流程推下去', v:'front' },
+      { t:'对内那块:把台账底稿做扎实,别留尾巴', v:'back' },
+      { t:'开会协调这些我来,坐那儿做表差点意思', v:'front' },
+      { t:'我宁可对着一摞资料核一天,也不想打一圈电话', v:'back' } ] },
+  { dim:'rhythm', q:'翻职位表,看到一栏写着「需经常出差/夜间轮班值守」:',
+    options:[
+      { t:'加分项,我受不了天天钉在工位上', v:'field' },
+      { t:'劝退,我要朝九晚五的确定性', v:'desk' },
+      { t:'轮班无所谓,别让我天天坐办公室就行', v:'field' },
+      { t:'偶尔跑跑可以,日常还是规律点好', v:'desk' } ] },
+  { dim:'way', q:'两个岗位摆在面前,你更想要哪种「爽感」:',
+    options:[
+      { t:'经手的事,从没出过差错', v:'rule' },
+      { t:'别人搞不定的事,都来问你', v:'expert' },
+      { t:'事再多,照规矩一件件办完,心里就踏实', v:'rule' },
+      { t:'把一摊业务钻透,成为「懂行的那个」', v:'expert' } ] },
+  { dim:'scene', q:'单位办大会,让你挑一个半天去帮忙,你会选:',
+    options:[
+      { t:'会务组:跑前跑后,对接各方', v:'front' },
+      { t:'材料组:把会议手册校到零错字', v:'back' },
+      { t:'接待组:把来宾一一招呼明白', v:'front' },
+      { t:'后台组:PPT 和音响都归我盯', v:'back' } ] },
+  { dim:'rhythm', q:'同事请假,让你顶一天外勤:',
+    options:[
+      { t:'挺好,正好出去换换脑子', v:'field' },
+      { t:'头大,我桌上那摊活还没弄完', v:'desk' },
+      { t:'可以啊,我本来就坐不住', v:'field' },
+      { t:'我宁愿替他干他的内业', v:'desk' } ] },
+  { dim:'way', q:'遇到一件没有先例的事,你的第一反应是:',
+    options:[
+      { t:'翻文件,看有没有相关规定和依据', v:'rule' },
+      { t:'先弄清楚这事本身的来龙去脉', v:'expert' },
+      { t:'先问问:以前类似的事是怎么处理的', v:'rule' },
+      { t:'先把里面的道理搞明白,再动手', v:'expert' } ] },
+  { dim:'scene', q:'干完一天,哪种「累」你更愿意承受:',
+    options:[
+      { t:'话说太多了,嗓子都哑了', v:'front' },
+      { t:'对着表格核了一天,眼都花了', v:'back' },
+      { t:'电话打了一圈,总算把事推下去了', v:'front' },
+      { t:'独自把一摞数据理顺了,脑子有点木', v:'back' } ] },
+  { dim:'rhythm', q:'周末朋友的安排里,最吸引你的是:',
+    options:[
+      { t:'去周边爬山、露营', v:'field' },
+      { t:'在家慢慢整理东西,把下周计划列好', v:'desk' },
+      { t:'去个没去过的地方逛逛', v:'field' },
+      { t:'补觉、看剧,哪儿都不去', v:'desk' } ] },
+  { dim:'way', q:'被夸的时候,哪句话你最受用:',
+    options:[
+      { t:'「你办的事,我从来不用复核」', v:'rule' },
+      { t:'「这行没人比你更懂」', v:'expert' },
+      { t:'「流程交给你最放心」', v:'rule' },
+      { t:'「有问题?得问你」', v:'expert' } ] },
+  { dim:'scene', q:'周五下午,领导说「这个活你和某某分一下」,你下意识想:',
+    options:[
+      { t:'先跟他商一下怎么分', v:'front' },
+      { t:'自己先把方案理出来再说', v:'back' },
+      { t:'让他对接人,我干中间那块', v:'front' },
+      { t:'让我挑的话,我挑不用跟人对接的', v:'back' } ] },
+  { dim:'rhythm', q:'想象一下三年后你的工位:',
+    options:[
+      { t:'东西越简单越好——人在外面跑', v:'field' },
+      { t:'工位就是我的小窝,抽屉里什么都有', v:'desk' },
+      { t:'日历上全是不同的事,累但新鲜', v:'field' },
+      { t:'每天的节奏都踩得准,稳', v:'desk' } ] },
+  { dim:'way', q:'两个岗位:一个是老牌大单位的标准流程,一个是新设小单位什么都得自己摸:',
+    options:[
+      { t:'大单位,成熟体系学得快', v:'rule' },
+      { t:'小单位,成长快', v:'expert' },
+      { t:'大单位,规矩清楚、省心', v:'rule' },
+      { t:'小单位,没人比我先懂', v:'expert' } ] },
+  { dim:'scene', q:'你更服哪种同事(嘴上不说):',
+    options:[
+      { t:'没有他协调不下来的事', v:'front' },
+      { t:'他手上从来不出一处错', v:'back' },
+      { t:'再乱的场面,他一站就稳', v:'front' },
+      { t:'他做的台账,谁看都明白', v:'back' } ] },
+  { dim:'rhythm', q:'体检报告上,哪个结果你能笑出来:',
+    options:[
+      { t:'「晒得挺黑啊」', v:'field' },
+      { t:'「要少坐,多活动」', v:'desk' },
+      { t:'「脚上茧子挺厚,走得不少」', v:'field' },
+      { t:'「颈椎要注意,坐太久了」', v:'desk' } ] },
+  { dim:'way', q:'领导交给你一个从没办过的业务,你更希望:',
+    options:[
+      { t:'有人给我一份现成的流程和模板', v:'rule' },
+      { t:'给原则和背景,细节我自己摸', v:'expert' },
+      { t:'先看别人办过的案例,照着来', v:'rule' },
+      { t:'少给框框,让我按业务逻辑自己搭', v:'expert' } ] }
+];
+
+/* 3) 8 种体制人格:key 的规律是 重心_节奏_成就(如 front_field_rule),别改 key 的拼法,
+   文案(name/tagline/p1/p2/charge/drain/posts/tip/match/clash)随便改;color 是该型的主色 */
+const TYPES = {
+  front_field_rule: {
+    name:'警犬型', emoji:'🐕🦺', color:'#3D6BE0',
+    tagline:'现场一有事,我比铃声先到。',
+    p1:'你是天生的一线体质:现场一有动静,你比铃声先到。指令清楚、行动干脆,场面越乱你越稳——别人往后缩的时候,你已经上手把事分开了。',
+    p2:'别人看你精力旺、胆子大,只有你自己知道:你不怕累,怕的是「没劲的累」。填表、开会、当一天的透明人——这样的日子过到第三周,你会开始灵魂出窍。别人的稳定是「不出错」,你的稳定是「每天真干了点事」。',
+    charge:['把事摁在现场、当场解决的那一下——累都值了','任务型节奏:忙是真忙,闲下来也理直气壮','打交道都是为了「办事」,对事不对人,你不虚任何场面'],
+    drain:['一整天只有会议和材料,没有一个现场','熬夜轮班之后,第二天还得精神在线','同一件小事重复一千遍,还得次次达标'],
+    posts:['公安系统(铁路公安、机场公安等):接处警、随车驻站,今天的事今天结','出入境边防检查:口岸一线查验,轮班是常态','海关旅检/缉私:口岸现场监管(缉私岗是警察编制)','市场监管、应急执法:现场检查、抽检、处置,跑动多'],
+    tip:'人民警察岗有体能测评和年龄限制、政审也更严——报名前先把职位表备注栏看仔细,别等进了面试才发现体测是道坎。',
+    match:'老黄牛型 🐂 —— 你在前面处置,它在后方把材料和台账兜得干干净净,一线+内勤是最经典的搭班结构',
+    clash:'军师型 🦊 —— 一个现场处置,一个纸上推演;它嫌你糙,你嫌它虚,坐一张桌子容易互相翻白眼'
+  },
+  front_desk_rule: {
+    name:'蜜蜂型', emoji:'🐝', color:'#F2B705',
+    tagline:'队伍再长,我这儿一个一个来。',
+    p1:'你有种别人羡慕不来的本事:在重复里保持耐心。同一套流程一天走八十遍,你照样能把第八十遍做出第一遍的认真——你在意的不只是流程,是流程那头的那个人。',
+    p2:'但这活有一半力气花在看不见的地方:接住脾气、消化误解。第一个人的火你还能笑着接,第十个人你就想静静。别人以为你脾气好,只有你知道那是职业素养。',
+    charge:['当场看着人把事办成,那句「谢谢」是真的','流程熟到闭眼走,节奏全在自己手里','窗口一关就下班,工作边界清清楚楚'],
+    drain:['不是你的错,骂声也先落在你头上','同一句话,今天解释第八十遍','忙起来,一杯水从热放到凉'],
+    posts:['税务办税服务厅:申报辅导、窗口受理','政务服务中心:综合窗口、一窗通办','社保/医保经办:参保登记、待遇咨询','12345 热线:接诉转办、回访核实','街道便民服务、社区岗:跑腿事项代办'],
+    tip:'职位表备注里写「窗口服务」就是字面意思——天天面对面;这类岗作息通常最规律,想稳定节奏的可以优先看。',
+    match:'军师型 🦊 —— 你在前台接件,它在后台把政策和口径拿捏好,前台后台刚好闭环',
+    clash:'雷达型 📡 —— 你一天见两百张面孔,它一天不想接一个电话,面对面坐着都像两个物种'
+  },
+  back_field_rule: {
+    name:'啄木鸟型', emoji:'🐦', color:'#2E9E67',
+    tagline:'哪里有虫,我敲哪里。',
+    p1:'你对「不对劲」过敏:台账上的数对不上、流程里少了一道、现场和报送的不一样——别人翻过去了,你会在那一页停下来。跑多少路都行,只要能把事实钉死。',
+    p2:'但你这活天生得罪人:你来的那天,被查的人心里就开始打鼓。你只是想对清楚一笔账,对方眼里你就是来找茬的。你要的不是脸皮厚,是心里有杆秤——查清事实,不冤枉,也不放过。',
+    charge:['对上一笔陈年老账,真相大白','跑现场比坐办公室对味,一天换几个地方不腻','数字过你的手之后,谁都挑不出毛病'],
+    drain:['被当成「来挑事的」,明里暗里给你脸色','线索藏在第几百页,翻到眼花','结论碰上有背景的事,压力从上面来'],
+    posts:['统计调查队:入户入企调查、数据核验','审计(外勤核查):查账、对账、取证','巡视巡察:进驻了解、问题线索','环保/安全生产督察:现场检查、回头看','海关稽查:核查企业账册'],
+    tip:'核查类岗位备注里「需经常出差」「深入一线」不是客套,是真的要跑——但对你是加分项。',
+    match:'雷达型 📡 —— 你出去查,它后台算;你带回来的原始账,它一眼就能看出哪块不对',
+    clash:'岩羊型 🐐 —— 你进山是带着任务来的,它进山只想安安静静看仪器——你到站检查那天,是它一个月里最烦的一天'
+  },
+  back_desk_rule: {
+    name:'老黄牛型', emoji:'🐂', color:'#9C7B54',
+    tagline:'不出岔子,就是我的本事。',
+    p1:'你是那种「平时想不起来夸、少了立刻乱套」的人:文件在你手里不会丢,账在你手里不会错,流程到你这里不会断。你没有什么惊天动地的产出——你的产出是「一切都正常运转」。',
+    p2:'「稳」容易被当成「应该的」:你干了十分,被看见的可能只有三分;临时的急活还总砸到「可靠的人」头上。你不爱争,不等于不在乎——所以选岗时去那些「靠谱是刚需」的地方,而不是「表演是刚需」的地方。',
+    charge:['一天结束,清单全划完,关上电脑那一刻最舒服','同事一句「这个问他准没错」','流程在手,节奏不慌,谁来都能接上'],
+    drain:['临时的急活,总砸到「可靠的人」头上','干了十分,被看见的是三分','琐事缠身,一天下来感觉啥都没干成'],
+    posts:['办公室:文书、综合协调、督办','机要档案:收发文、归档、保密','财务:出纳、会计、资产管理','组织人事:干部档案、工资福利','后勤保障:机关运转的那些「小事」'],
+    tip:'这类岗位不好出彩、但少了立刻乱套——适合真坐得住的人,别因为「听起来不响」错过它。',
+    match:'警犬型 🐕🦺 —— 它在前面处置现场,你在后方把材料台账兜得干干净净,体制内最经典的搭班子',
+    clash:'鹰眼型 🦅 —— 一个要「流程走全」,一个要「结果说话」;它嫌你墨迹,你嫌它不按规矩来'
+  },
+  front_field_expert: {
+    name:'鹰眼型', emoji:'🦅', color:'#B3592E',
+    tagline:'真假好坏,过我一眼。',
+    p1:'你是「人形检测仪」体质:别人看热闹,你看门道。货单上一个不起眼的数字、现场一处不自然的痕迹,别人走过去了,你停下来。你的专业不在书本里,在手感里。',
+    p2:'但这身本事,一半靠腿、一半靠胆:现场不总是体面的,有的地方又脏又险,有的场合对方明里暗里想让你「通融」。你只信证据不信人情——这让你在酒桌上不讨巧,但现场没人敢糊弄你。',
+    charge:['一眼看出真假的那一瞬间,干十年也上头','你的判断当场拦下一批隐患,价值感即时结算','专业越老越吃香,年限就是资本'],
+    drain:['现场环境有时是真恶劣','总有人想让你「抬抬手」','判断挨质疑的时候,得拿证据硬扛'],
+    posts:['海关查验:机检图像研判、开箱查验','出入境检验检疫:样品查验、风险处置','食品药品抽检:现场抽样、快检','消防监督:现场检查、隐患整改','事故调查:现场勘查、原因认定'],
+    tip:'部分岗位有体检/体能要求,备注会写明「一线执法」;专业限制往往很具体(食品、药学、消防工程等)——专业对口的人别浪费这道护城河。',
+    match:'岩羊型 🐐 —— 一个查货、一个测样,都是「手上见真章」的人,凑一起能聊一晚上装备',
+    clash:'老黄牛型 🐂 —— 你要结果,它要流程;配合起来,你的急和它的稳互相硌得慌'
+  },
+  front_desk_expert: {
+    name:'军师型', emoji:'🦊', color:'#7A5AF8',
+    tagline:'别人忙事,我算局。',
+    p1:'你是把复杂问题讲简单的那种脑子:一件事乱成一团麻,你能找到线头;一份材料弯弯绕绕,你能三句话说明白。你最享受的时刻,是「想通了」的那一下。',
+    p2:'但你的战场不在聚光灯下:方案是你出的,签字的是别人;想对了没人鼓掌,想错了全来找你。你不介意当影子,只介意被外行指挥——宁做小池里最被倚重的那个,别做大池里可有可无的那个。',
+    charge:['所有人都绕不明白的事,被你三句讲清','你的判断被写进方案、变成规则','跟聪明人过招,越辩越通透'],
+    drain:['出主意的人在幕后,背锅倒可能在前排','方案被外行拍板否掉','你还在推演,别人已经拍板了——烂摊子回头找你收'],
+    posts:['政研室/研究室:综合文稿、政策研究','法规科:政策法规、行政复议应诉','金融监管:机构监管、规则起草','发改/宏观管理:规划、项目、协调','宣传口:新闻稿、舆情、对外表达'],
+    tip:'职位表里「从事综合文稿」「政策研究」多指向这个方向——门槛高、成长快、离核心近。',
+    match:'蜜蜂型 🐝 —— 你定规矩,它办业务;你在后面把关,它在前面接件',
+    clash:'警犬型 🐕🦺 —— 它嫌你纸上谈兵,你嫌它莽;两句话没说完就要吵起来'
+  },
+  back_desk_expert: {
+    name:'雷达型', emoji:'📡', color:'#0E8F9E',
+    tagline:'不出声,但异常逃不过我。',
+    p1:'你的注意力天生带「扫描」属性:一片数据里,那个不协调的数你一眼看见;一条异常记录,别人跳过去了,你倒回去看三遍。你不爱说话,但你的沉默里全是运算。',
+    p2:'理解你的人不多:别人以为你在发呆,其实你脑子里在跑模型。预警这东西——准了没人夸,漏了全是你的责任。所以去那些真正吃「专业判断」的岗位,你的「静」才值钱。',
+    charge:['从数据里挖出别人没看见的异常,像开了透视','没人打扰的深度工作,一个下午能沉到底','你的判断被验证是准的'],
+    drain:['功劳是「大家一起的」,出错是「你没提醒到位」','外行觉得你就是个「看电脑的」','被催着快点出结论,但你的准恰恰来自慢'],
+    posts:['气象/地震业务:预报、监测、值守','统计局数据加工:审核、汇总、评估','信息中心/大数据:系统、数据治理','税务风险分析:后台比对、疑点推送','海关风险防控:舱单分析、布控'],
+    tip:'这类岗专业限制明确、考核看准确率——安静的人在这儿是主角。',
+    match:'啄木鸟型 🐦 —— 它带回来原始账,只有你能一眼看出哪块不对',
+    clash:'蜜蜂型 🐝 —— 你躲人,它迎人;一个觉得对面吵,一个觉得对面冷'
+  },
+  back_field_expert: {
+    name:'岩羊型', emoji:'🐐', color:'#6E8B3D',
+    tagline:'越没人去的地方,我的专业越用得上。',
+    p1:'你是「站点型」的人:一个偏远测点、一台仪器、一组要长期盯的数——别人觉得苦,你觉得正经。你能在山里、河边、观测站安营扎寨,跟数据待一整天不腻,因为你看得见自己在积累什么。',
+    p2:'但你也吃了「安静」的亏:评优想不到你,因为你的战场没观众;回城的机会总轮不上——谁让你是「那里离不开的人」。想清楚你要的是热闹还是手艺——想清楚了,这份清净就是别人抢不到的红利。',
+    charge:['长期数据里看出规律的那一刻,只有你懂那有多爽','日子清净、人事简单,心力全给专业','手艺在手,站里离不开你'],
+    drain:['偏远、单调、轮值,对象可能真是山和水','存在感全靠数据说话,没人围观你干活','汛期、通宵、恶劣天气都是排班表上的常客'],
+    posts:['水文/流域机构:水文站、巡测、汛期值守','环境监测站:采样、分析、自动站运维','气象观测站:观探测、设备保障','地质调查:野外勘查、剖面测量','地震台站:台网运维、数据采集'],
+    tip:'这类岗常写「工作地点在XX县/野外台站」——报考前先查地图;接受得了地点,对愿意安静做事的人就是高性价比的清净之选。',
+    match:'鹰眼型 🦅 —— 都是靠手上的专业吃饭的人,凑到一起不聊虚的',
+    clash:'啄木鸟型 🐦 —— 你进山是去观测的,它进山是去检查的——同一座山,两种人,互相血压高'
+  }
+};
+
+/* 外勤浓度参考值:按「节奏」维度的 field 票数 0~5 映射 */
+const HOURS = ['基本不出楼','偶尔出去跑','动静一半一半','偏外勤','主力外勤','天天在一线'];
+
+/* ============================================================
+   引擎(不用改)
+   ============================================================ */
+const $ = id => document.getElementById(id);
+const scrIntro = $('scr-intro'), scrQuiz = $('scr-quiz'), scrResult = $('scr-result');
+let qi = 0;
+let lastCode = null;
+let myCode = null, myStats = null;
+const answers = new Array(QUESTIONS.length).fill(null);
+let lock = false;
+
+function showScreen(el){
+  [scrIntro, scrQuiz, scrResult].forEach(s => s.classList.remove('active'));
+  el.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function renderQ(){
+  const q = QUESTIONS[qi];
+  $('q-text').textContent = q.q;
+  $('counter').textContent = (qi + 1) + ' / ' + QUESTIONS.length;
+  $('prog-fill').style.width = (qi / QUESTIONS.length * 100) + '%';
+  $('btn-back').disabled = (qi === 0);
+  $('btn-prev').disabled = (qi === 0);
+  const box = $('opts');
+  box.textContent = '';
+  q.options.forEach((o, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt' + (answers[qi] === i ? ' picked' : '');
+    btn.innerHTML = '<span class="opt-tag"></span><span class="opt-tx"></span><svg class="opt-paw" aria-hidden="true"><use href="#svg-paw"/></svg>';
+    btn.querySelector('.opt-tag').textContent = 'ABCD'[i];
+    btn.querySelector('.opt-tx').textContent = o.t;
+    btn.onclick = () => pick(i);
+    box.appendChild(btn);
+  });
+}
+
+function pick(i){
+  if (lock) return;
+  lock = true;
+  answers[qi] = i;
+  renderQ();
+  setTimeout(() => {
+    qi++;
+    if (qi < QUESTIONS.length) {
+      renderQ();
+      setTimeout(() => { lock = false; }, 320);  // 新题出现后再缓冲,防止连点误答下一题
+    } else {
+      lock = false;
+      tally();
+      showScreen(scrResult);
+    }
+  }, 260);
+}
+
+function goBack(){
+  if (lock || qi === 0) return;
+  qi--;
+  renderQ();
+}
+
+function tally(){
+  const byDim = { scene:[], rhythm:[], way:[] };
+  QUESTIONS.forEach((q, i) => {
+    const sel = answers[i];
+    byDim[q.dim].push(sel == null ? '?' : q.options[sel].v);
+  });
+  const front  = byDim.scene.filter(v => v === 'front').length;
+  const field  = byDim.rhythm.filter(v => v === 'field').length;
+  const expert = byDim.way.filter(v => v === 'expert').length;
+  const code = (front >= 3 ? 'front' : 'back') + '_' +
+               (field >= 3 ? 'field' : 'desk') + '_' +
+               (expert >= 3 ? 'expert' : 'rule');
+  myCode = code;
+  myStats = { front, field, expert };
+  renderResult(code, myStats);
+}
+
+function renderResult(code, s, isView){
+  lastCode = code;
+  const t = TYPES[code];
+  scrResult.style.setProperty('--accent', t.color);
+  $('r-kicker').textContent = isView ? '你正在查看——' : '你的体制人格是——';
+  $('r-gauge-label').textContent = isView ? '该类型的外勤浓度' : '外勤浓度';
+  $('btn-myresult').style.display = isView ? '' : 'none';
+  $('btn-copy').style.display = isView ? 'none' : '';
+  $('share-hint').style.display = isView ? 'none' : '';
+  $('r-emoji').textContent = t.emoji;
+  $('r-name').textContent = t.name;
+  $('r-tagline').textContent = t.tagline;
+
+  const chips = [
+    s.front >= 3 ? '重心 · 跟人打交道' : '重心 · 跟事打交道',
+    s.field >= 3 ? '节奏 · 往外跑' : '节奏 · 坐得住',
+    s.expert >= 3 ? '成就感 · 把事钻透' : '成就感 · 把事办稳'
+  ];
+  const chipBox = $('r-chips');
+  chipBox.textContent = '';
+  chips.forEach(c => {
+    const el = document.createElement('span');
+    el.className = 'chip';
+    el.textContent = c;
+    chipBox.appendChild(el);
+  });
+
+  $('r-hours').textContent = HOURS[s.field];
+
+  const barsBox = $('r-bars');
+  barsBox.textContent = '';
+  const bars = [
+    [s.field >= 3 ? '往外跑' : '坐得住', Math.max(s.field, 5 - s.field) * 20],
+    [s.expert >= 3 ? '钻门道' : '照章办', Math.max(s.expert, 5 - s.expert) * 20]
+  ];
+  bars.forEach(pair => {
+    const row = document.createElement('div');
+    row.className = 'bar-row';
+    const lb = document.createElement('span');
+    lb.textContent = pair[0];
+    const track = document.createElement('div');
+    track.className = 'bar-track';
+    const fill = document.createElement('div');
+    fill.className = 'bar-fill';
+    fill.dataset.w = pair[1];
+    track.appendChild(fill);
+    const num = document.createElement('span');
+    num.className = 'bar-pct';
+    num.textContent = pair[1] + '%';
+    row.appendChild(lb); row.appendChild(track); row.appendChild(num);
+    barsBox.appendChild(row);
+  });
+
+  $('r-p1').textContent = t.p1;
+  $('r-p2').textContent = t.p2;
+
+  const fillList = (id, arr) => {
+    const ul = $(id);
+    ul.textContent = '';
+    arr.forEach(x => {
+      const li = document.createElement('li');
+      li.textContent = x;
+      ul.appendChild(li);
+    });
+  };
+  fillList('r-charge', t.charge);
+  fillList('r-drain', t.drain);
+  fillList('r-posts', t.posts);
+  $('r-tip').textContent = t.tip;
+
+  $('r-match').textContent = t.match;
+  $('r-clash').textContent = t.clash;
+
+  const grid = $('others-grid');
+  grid.textContent = '';
+  Object.keys(TYPES).forEach(k => {
+    const ty = TYPES[k];
+    const card = document.createElement('div');
+    card.className = 'other-card' + (k === code ? ' cur' : '');
+    const n = document.createElement('div');
+    n.className = 'oc-name';
+    n.textContent = ty.emoji + ' ' + ty.name;
+    if (k === myCode) {
+      const me = document.createElement('span');
+      me.className = 'oc-me';
+      me.textContent = '我';
+      n.appendChild(me);
+    }
+    const g = document.createElement('div');
+    g.className = 'oc-tag';
+    g.textContent = ty.tagline;
+    card.appendChild(n); card.appendChild(g);
+    card.onclick = () => showType(k);
+    grid.appendChild(card);
+  });
+
+  const shop = $('shop-line');
+  if (SHOP_NAME) {
+    shop.textContent = '本测试由「' + SHOP_NAME + '」出品 · 欢迎转发给朋友';
+  } else {
+    shop.style.display = 'none';
+  }
+
+  const batW = 22 + s.field * 15.6;
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    $('bat-fill').style.width = batW + '%';
+    document.querySelectorAll('#r-bars .bar-fill').forEach(f => {
+      f.style.width = f.dataset.w + '%';
+    });
+  }));
+}
+
+/* 图鉴:点开某个类型看详情(用代表值展示),可返回自己的结果 */
+function representativeStats(code){
+  const p = code.split('_');
+  return { front: p[0] === 'front' ? 4 : 1, field: p[1] === 'field' ? 4 : 1, expert: p[2] === 'expert' ? 4 : 1 };
+}
+
+function showType(k){
+  if (k === myCode && myStats) { renderResult(myCode, myStats, false); }
+  else { renderResult(k, representativeStats(k), true); }
+  window.scrollTo(0, 0);
+}
+
+/* 复制结果文案(带兜底) */
+function copyResult(){
+  const t = TYPES[lastCode];
+  const text = '我的体制人格是「' + t.name + '」' + t.emoji + '\n' + t.tagline + '\n—— 来自《考公人格测试》';
+  const btn = $('btn-copy');
+  const done = () => {
+    btn.textContent = '已复制,去粘贴 ✓';
+    setTimeout(() => { btn.textContent = '复制我的结果文案'; }, 1400);
+  };
+  const fallback = () => {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); done(); } catch (e) {}
+    document.body.removeChild(ta);
+  };
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(done).catch(fallback);
+  } else {
+    fallback();
+  }
+}
+
+/* 按钮绑定 */
+$('btn-start').onclick = () => {
+  qi = 0;
+  answers.fill(null);
+  renderQ();
+  showScreen(scrQuiz);
+};
+$('btn-back').onclick = goBack;
+$('btn-prev').onclick = goBack;
+let clearTimer = null;
+$('btn-clear').onclick = () => {
+  const b = $('btn-clear');
+  if (lock) return;
+  if (b.classList.contains('confirming')) {
+    clearTimeout(clearTimer);
+    b.classList.remove('confirming');
+    b.textContent = '清空重来,回首页';
+    qi = 0;
+    answers.fill(null);
+    showScreen(scrIntro);
+  } else {
+    b.classList.add('confirming');
+    b.textContent = '再点一次确认清空';
+    clearTimer = setTimeout(() => {
+      b.classList.remove('confirming');
+      b.textContent = '清空重来,回首页';
+    }, 2600);
+  }
+};
+$('btn-copy').onclick = copyResult;
+$('btn-myresult').onclick = () => {
+  if (myCode && myStats) { renderResult(myCode, myStats, false); window.scrollTo(0, 0); }
+};
+$('btn-again').onclick = () => {
+  qi = 0;
+  answers.fill(null);
+  renderQ();
+  showScreen(scrQuiz);
+};
+
+/* ============================================================
+   开发自查钩子(买家无感,不影响正常使用)
+   ?dev=q&i=2          直接看第 3 题
+   ?dev=result&t=front_field_rule   直接看某型结果(&weak=1 出 4/5 票形态)
+   ============================================================ */
+(function(){
+  const params = new URLSearchParams(location.search);
+  const dev = params.get('dev');
+  if (!dev) return;
+  document.documentElement.classList.add('no-anim');
+  if (params.get('diag')) {
+    const badge = document.createElement('div');
+    badge.style.cssText = 'position:fixed;left:4px;bottom:4px;z-index:99;background:#000d;color:#3f6;font:12px monospace;padding:2px 6px;border-radius:6px';
+    badge.textContent = window.innerWidth + 'x' + window.innerHeight + ' dpr' + window.devicePixelRatio;
+    document.body.appendChild(badge);
+  }
+  if (dev === 'q') {
+    let i = parseInt(params.get('i') || '0', 10);
+    if (isNaN(i) || i < 0) i = 0;
+    if (i > QUESTIONS.length - 1) i = QUESTIONS.length - 1;
+    for (let k = 0; k < i; k++) answers[k] = k % 2;
+    qi = i;
+    renderQ();
+    showScreen(scrQuiz);
+  } else if (dev === 'result') {
+    const code = params.get('t') || 'front_field_rule';
+    const parts = code.split('_');
+    const want = { scene: parts[0], rhythm: parts[1], way: parts[2] };
+    QUESTIONS.forEach((q, i) => {
+      answers[i] = q.options.findIndex(o => o.v === want[q.dim]);
+    });
+    if (params.get('weak')) {
+      ['scene','rhythm','way'].forEach(d => {
+        const i = QUESTIONS.findIndex(q => q.dim === d);
+        if (i > -1) answers[i] = QUESTIONS[i].options.findIndex(o => o.v !== want[d]);
+      });
+    }
+    tally();
+    showScreen(scrResult);
+  }
+})();
+</script>
+</body>
+</html>
